@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+        <link rel="stylesheet" href="css/qgis2web.css">
+        <link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/L.Control.Layers.Tree.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="data/ServiceArea_1.js"></script>
+        <script src="data/Roads_2.js"></script>
+        <script src="data/BusStop_3.js"></script>
+        <script>
+        var map = L.map('map', {
+            zoomControl:false, maxZoom:28, minZoom:1
+        }).fitBounds([[-7.3305301945929555,112.70728678061298],[-7.227114946346266,112.84429387469793]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        // remove popup's row if "visible-with-data"
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
+        }
+        // add class to format popup if it contains media
+		function addClassToPopupIfMedia(content, popup) {
+			var tempDiv = document.createElement('div');
+			tempDiv.innerHTML = content;
+			if (tempDiv.querySelector('td img')) {
+				popup._contentNode.classList.add('media');
+					// Delay to force the redraw
+					setTimeout(function() {
+						popup.update();
+					}, 10);
+			} else {
+				popup._contentNode.classList.remove('media');
+			}
+		}
+        var zoomControl = L.control.zoom({
+            position: 'topleft'
+        }).addTo(map);
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane_Positron_0');
+        map.getPane('pane_Positron_0').style.zIndex = 400;
+        var layer_Positron_0 = L.tileLayer('https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+            pane: 'pane_Positron_0',
+            opacity: 1.0,
+            attribution: '<a href="https://cartodb.com/basemaps/">Map tiles by CartoDB, under CC BY 3.0. Data by OpenStreetMap, under ODbL.</a>',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 20
+        });
+        layer_Positron_0;
+        map.addLayer(layer_Positron_0);
+        function pop_ServiceArea_1(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['id'] !== null ? autolinker.link(String(feature.properties['id']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="Jarak_Layanan(Meter)" colspan="2"><strong>Jarak_Layanan(Meter)</strong><br />' + (feature.properties['Jarak_Layanan(Meter)'] !== null ? autolinker.link(String(feature.properties['Jarak_Layanan(Meter)']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_ServiceArea_1_0(feature) {
+            if (feature.properties['Jarak_Layanan(Meter)'] >= 500.000000 && feature.properties['Jarak_Layanan(Meter)'] <= 1500.000000 ) {
+                return {
+                pane: 'pane_ServiceArea_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(0,0,4,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['Jarak_Layanan(Meter)'] >= 1500.000000 && feature.properties['Jarak_Layanan(Meter)'] <= 2000.000000 ) {
+                return {
+                pane: 'pane_ServiceArea_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(80,18,123,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['Jarak_Layanan(Meter)'] >= 2000.000000 && feature.properties['Jarak_Layanan(Meter)'] <= 2500.000000 ) {
+                return {
+                pane: 'pane_ServiceArea_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(182,55,122,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['Jarak_Layanan(Meter)'] >= 2500.000000 && feature.properties['Jarak_Layanan(Meter)'] <= 3000.000000 ) {
+                return {
+                pane: 'pane_ServiceArea_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(251,135,97,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['Jarak_Layanan(Meter)'] >= 3000.000000 && feature.properties['Jarak_Layanan(Meter)'] <= 3000.000000 ) {
+                return {
+                pane: 'pane_ServiceArea_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(252,253,191,1.0)',
+                interactive: true,
+            }
+            }
+        }
+        map.createPane('pane_ServiceArea_1');
+        map.getPane('pane_ServiceArea_1').style.zIndex = 401;
+        map.getPane('pane_ServiceArea_1').style['mix-blend-mode'] = 'normal';
+        var layer_ServiceArea_1 = new L.geoJson(json_ServiceArea_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_ServiceArea_1',
+            layerName: 'layer_ServiceArea_1',
+            pane: 'pane_ServiceArea_1',
+            onEachFeature: pop_ServiceArea_1,
+            style: style_ServiceArea_1_0,
+        });
+        bounds_group.addLayer(layer_ServiceArea_1);
+        map.addLayer(layer_ServiceArea_1);
+        function pop_Roads_2(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td class="visible-with-data" id="Jenis_Jalan" colspan="2"><strong>Jenis_Jalan</strong><br />' + (feature.properties['Jenis_Jalan'] !== null ? autolinker.link(String(feature.properties['Jenis_Jalan']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="Nama_Jalan" colspan="2"><strong>Nama_Jalan</strong><br />' + (feature.properties['Nama_Jalan'] !== null ? autolinker.link(String(feature.properties['Nama_Jalan']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Roads_2_0() {
+            return {
+                pane: 'pane_Roads_2',
+                opacity: 1,
+                color: 'rgba(72,123,182,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 2.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Roads_2');
+        map.getPane('pane_Roads_2').style.zIndex = 402;
+        map.getPane('pane_Roads_2').style['mix-blend-mode'] = 'normal';
+        var layer_Roads_2 = new L.geoJson(json_Roads_2, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Roads_2',
+            layerName: 'layer_Roads_2',
+            pane: 'pane_Roads_2',
+            onEachFeature: pop_Roads_2,
+            style: style_Roads_2_0,
+        });
+        bounds_group.addLayer(layer_Roads_2);
+        map.addLayer(layer_Roads_2);
+        function pop_BusStop_3(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td class="visible-with-data" id="Nama_Halte" colspan="2"><strong>Nama_Halte</strong><br />' + (feature.properties['Nama_Halte'] !== null ? autolinker.link(String(feature.properties['Nama_Halte']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="Foto_Halte" colspan="2"><strong>Foto_Halte</strong><br />' + (feature.properties['Foto_Halte'] !== null ? '<img src="images/' + String(feature.properties['Foto_Halte']).replace(/[\\/:]/g, '_').trim().replace(/'/g, '\'').replace(/"/g, '&quot;') + '">' : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_BusStop_3_0(feature) {
+            switch(String(feature.properties['Nama_Halte'])) {
+                case 'Halte PENS':
+                    return {
+                pane: 'pane_BusStop_3',
+                radius: 8.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(117,146,226,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'SB Galaxy 2':
+                    return {
+                pane: 'pane_BusStop_3',
+                radius: 8.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(204,98,165,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'SB ITS':
+                    return {
+                pane: 'pane_BusStop_3',
+                radius: 8.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(199,84,222,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'SB Kedung Baruk':
+                    return {
+                pane: 'pane_BusStop_3',
+                radius: 8.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(142,118,202,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'SB KONI MERR':
+                    return {
+                pane: 'pane_BusStop_3',
+                radius: 8.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(226,119,25,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'SB RS Haji 1':
+                    return {
+                pane: 'pane_BusStop_3',
+                radius: 8.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(39,201,144,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'SB Semolowaru 2':
+                    return {
+                pane: 'pane_BusStop_3',
+                radius: 8.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(237,237,65,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'SB Sentra UKM MERR':
+                    return {
+                pane: 'pane_BusStop_3',
+                radius: 8.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(108,190,210,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'SB SMPN 19':
+                    return {
+                pane: 'pane_BusStop_3',
+                radius: 8.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(21,207,40,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'SB UNAIR 1':
+                    return {
+                pane: 'pane_BusStop_3',
+                radius: 8.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(228,37,53,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_BusStop_3');
+        map.getPane('pane_BusStop_3').style.zIndex = 403;
+        map.getPane('pane_BusStop_3').style['mix-blend-mode'] = 'normal';
+        var layer_BusStop_3 = new L.geoJson(json_BusStop_3, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_BusStop_3',
+            layerName: 'layer_BusStop_3',
+            pane: 'pane_BusStop_3',
+            onEachFeature: pop_BusStop_3,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_BusStop_3_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_BusStop_3);
+        map.addLayer(layer_BusStop_3);
+        var overlaysTree = [
+            {label: 'Bus Stop<br /><table><tr><td style="text-align: center;"><img src="legend/BusStop_3_HaltePENS0.png" /></td><td>Halte PENS</td></tr><tr><td style="text-align: center;"><img src="legend/BusStop_3_SBGalaxy21.png" /></td><td>SB Galaxy 2</td></tr><tr><td style="text-align: center;"><img src="legend/BusStop_3_SBITS2.png" /></td><td>SB ITS</td></tr><tr><td style="text-align: center;"><img src="legend/BusStop_3_SBKedungBaruk3.png" /></td><td>SB Kedung Baruk</td></tr><tr><td style="text-align: center;"><img src="legend/BusStop_3_SBKONIMERR4.png" /></td><td>SB KONI MERR</td></tr><tr><td style="text-align: center;"><img src="legend/BusStop_3_SBRSHaji15.png" /></td><td>SB RS Haji 1</td></tr><tr><td style="text-align: center;"><img src="legend/BusStop_3_SBSemolowaru26.png" /></td><td>SB Semolowaru 2</td></tr><tr><td style="text-align: center;"><img src="legend/BusStop_3_SBSentraUKMMERR7.png" /></td><td>SB Sentra UKM MERR</td></tr><tr><td style="text-align: center;"><img src="legend/BusStop_3_SBSMPN198.png" /></td><td>SB SMPN 19</td></tr><tr><td style="text-align: center;"><img src="legend/BusStop_3_SBUNAIR19.png" /></td><td>SB UNAIR 1</td></tr></table>', layer: layer_BusStop_3},
+            {label: '<img src="legend/Roads_2.png" /> Roads', layer: layer_Roads_2},
+            {label: 'Service Area<br /><table><tr><td style="text-align: center;"><img src="legend/ServiceArea_1_50015000.png" /></td><td>500 - 1500</td></tr><tr><td style="text-align: center;"><img src="legend/ServiceArea_1_150020001.png" /></td><td>1500 - 2000</td></tr><tr><td style="text-align: center;"><img src="legend/ServiceArea_1_200025002.png" /></td><td>2000 - 2500</td></tr><tr><td style="text-align: center;"><img src="legend/ServiceArea_1_250030003.png" /></td><td>2500 - 3000</td></tr><tr><td style="text-align: center;"><img src="legend/ServiceArea_1_300030004.png" /></td><td>3000 - 3000</td></tr></table>', layer: layer_ServiceArea_1},
+            {label: "Positron", layer: layer_Positron_0},]
+        var lay = L.control.layers.tree(null, overlaysTree,{
+            //namedToggle: true,
+            //selectorBack: false,
+            //closedSymbol: '&#8862; &#x1f5c0;',
+            //openedSymbol: '&#8863; &#x1f5c1;',
+            //collapseAll: 'Collapse all',
+            //expandAll: 'Expand all',
+            collapsed: true,
+        });
+        lay.addTo(map);
+        setBounds();
+        </script>
+    </body>
+</html>
